@@ -1,0 +1,72 @@
+<!-- app/templates/books/dashboard.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0">Currently Borrowed Books</h4>
+            </div>
+            <div class="card-body">
+                {% if borrowed_books %}
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Due Date</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for record in borrowed_books %}
+                                <tr>
+                                    <td>{{ record.book.title }}</td>
+                                    <td>{{ record.due_date.strftime('%Y-%m-%d') }}</td>
+                                    <td>
+                                        {% if record.due_date < now %}
+                                            <span class="badge bg-danger">Overdue</span>
+                                        {% else %}
+                                            <span class="badge bg-success">On Time</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <form action="{{ url_for('books.return_book', id=record.book.id) }}" method="POST" style="display: inline;">
+                                            <button type="submit" class="btn btn-sm btn-primary">Return</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p>You haven't borrowed any books yet.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0">Quick Stats</h4>
+            </div>
+            <div class="card-body">
+                <div class="d-flex justify-content-between mb-3">
+                    <span>Books Borrowed:</span>
+                    <span class="badge bg-primary">{{ borrowed_books|length }}</span>
+                </div>
+                <div class="d-flex justify-content-between mb-3">
+                    <span>Overdue Books:</span>
+                    <span class="badge bg-danger">
+                        {{ borrowed_books|selectattr('due_date', 'lt', now)|list|length }}
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

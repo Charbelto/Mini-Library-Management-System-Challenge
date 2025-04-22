@@ -1,0 +1,96 @@
+<!-- app/templates/books/book_list.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <div class="row align-items-center">
+            <div class="col-md-6">
+                <h4 class="mb-0">Book List</h4>
+            </div>
+            <div class="col-md-6 text-end">
+                {% if current_user.role == 'admin' %}
+                <a href="{{ url_for('books.new_book') }}" class="btn btn-primary">Add New Book</a>
+                <a href="{{ url_for('books.export_csv') }}" class="btn btn-secondary">Export CSV</a>
+                <a href="#" class="btn btn-warning">Edit</a>  <!-- Placeholder for Edit functionality -->
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <form class="row g-3 mb-4">
+            <div class="col-md-4">
+                <input type="text" class="form-control" name="search" placeholder="Search books..." value="{{ request.args.get('search', '') }}">
+            </div>
+            <div class="col-md-3">
+                <select class="form-select" name="genre">
+                    <option value="">All Genres</option>
+                    <option value="Fiction">Fiction</option>
+                    <option value="Non-Fiction">Non-Fiction</option>
+                    <option value="Science">Science</option>
+                    <option value="History">History</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <select class="form-select" name="status">
+                    <option value="">All Status</option>
+                    <option value="available">Available</option>
+                    <option value="borrowed">Borrowed</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100">Filter</button>
+            </div>
+        </form>
+
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Cover</th>
+                        <th>Title</th>
+                        <th>Author</th>
+                        <th>Genre</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for book in books %}
+                    <tr>
+                        <td>
+                            {% if book.cover_image %}
+                            <img src="{{ book.cover_image }}" alt="Cover" class="book-cover-thumb">
+                            {% else %}
+                            <div class="no-cover">No Cover</div>
+                            {% endif %}
+                        </td>
+                        <td>{{ book.title }}</td>
+                        <td>{{ book.author }}</td>
+                        <td>{{ book.genre }}</td>
+                        <td>
+                            <span class="badge bg-{{ 'success' if book.status == 'available' else 'warning' }}">
+                                {{ book.status }}
+                            </span>
+                        </td>
+                        <td>
+                            {% if current_user.role in ['admin', 'librarian'] %}
+                            <a href="{{ url_for('books.edit_book', id=book.id) }}" class="btn btn-sm btn-primary">Edit</a>
+                            <form action="{{ url_for('books.delete_book', id=book.id) }}" method="POST" style="display: inline;">
+                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">Delete</button>
+                            </form>
+                            {% endif %}
+                            {% if book.status == 'available' %}
+                            <form action="{{ url_for('books.checkout_book', id=book.id) }}" method="POST" style="display: inline;">
+                                <button type="submit" class="btn btn-sm btn-success">Borrow</button>
+                            </form>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

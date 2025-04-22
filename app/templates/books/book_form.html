@@ -1,0 +1,66 @@
+<!-- app/templates/books/book_form.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0">{{ 'Edit' if book else 'Add' }} Book</h4>
+            </div>
+            <div class="card-body">
+                <form method="POST" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label for="title" class="form-label">Title</label>
+                        <input type="text" class="form-control" id="title" name="title" 
+                               value="{{ book.title if book else '' }}" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="author" class="form-label">Author</label>
+                        <input type="text" class="form-control" id="author" name="author"
+                               value="{{ book.author if book else '' }}" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="isbn" class="form-label">ISBN</label>
+                        <input type="text" class="form-control" id="isbn" name="isbn"
+                               value="{{ book.isbn if book else '' }}" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="publication_date" class="form-label">Publication Date</label>
+                        <input type="date" class="form-control" id="publication_date" name="publication_date"
+                               value="{{ book.publication_date.strftime('%Y-%m-%d') if book.publication_date else '' }}" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="genre" class="form-label">Genre</label>
+                        <select class="form-select" id="genre" name="genre" required>
+                            <option value="">Select Genre</option>
+                            <option value="Fiction" {{ 'selected' if book and book.genre == 'Fiction' else '' }}>Fiction</option>
+                            <option value="Non-Fiction" {{ 'selected' if book and book.genre == 'Non-Fiction' else '' }}>Non-Fiction</option>
+                            <option value="Science" {{ 'selected' if book and book.genre == 'Science' else '' }}>Science</option>
+                            <option value="History" {{ 'selected' if book and book.genre == 'History' else '' }}>History</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description</label>
+                        <textarea class="form-control" id="description" name="description" rows="3">{{ book.description if book else '' }}</textarea>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="cover_image" class="form-label">Cover Image URL</label>
+                        <input type="text" class="form-control" id="cover_image" name="cover_image"
+                               value="{{ book.cover_image if book else '' }}">
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">{{ 'Update' if book else 'Add' }} Book</button>
+                    <a href="{{ url_for('books.book_list') }}" class="btn btn-secondary">Cancel</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
